@@ -1,7 +1,7 @@
 
-## genBinomTestCI
+## calcCI
 
-genBinomTestCI <- function(c, n, alpha = 0.05)
+calcCI <- function(c, n, alpha = 0.05)
     {
         CI <- function(p, c, n, alpha)
             {
@@ -18,9 +18,9 @@ genBinomTestCI <- function(c, n, alpha = 0.05)
         c(1 - lower, upper)
     }
 
-## genBinomTest
+## calcPvalue
 
-genBinomTest <- function(c, n, p = 0.5, alpha = 0.05)
+calcPvalue <- function(c, n, p = 0.5)
     {
         ## vectorized version, maybe a bit faster
         ## for better reading the other version though
@@ -30,39 +30,7 @@ genBinomTest <- function(c, n, p = 0.5, alpha = 0.05)
                              max(sapply(0:c, q.pbinom,
                                         c = c, p = p, n = n)),
                              1))
-
-        ## if(c <= (n*p - 1))
-        ##     {
-        ##         ## function B(c, p)
-        ##         res <- pbinom(c, n, p)
-        ##     }
-        ## else
-        ##     {
-        ##         if(c >= (n*p))
-        ##             {
-        ##                 ## else return 1
-        ##                 res <- 1
-        ##             }
-        ##         else
-        ##             {
-        ##                 ## function Q(c, p)
-        ##                 res <- max(sapply(0:c, q.pbinom,
-        ##                                   c = c, p = p, n = n))
-        ##             }
-        ##     }
-
         res
-
-        ## Output
-        ## cat("\n")
-        ## cat("\tGeneralized binomial test\n")
-        ## cat("\ndata: \n")
-        ## cat("\tN\tObserved k\tExpected k\n")
-        ## cat("\t", n, "\t\t", c, "\t", n*p, "\n")
-        ## cat("\tAssumed p\tObserved p\n")
-        ## cat("\t", p, "\t", c/n)
-        ## cat("\n")
-        ## res
     }
 
 
@@ -73,8 +41,59 @@ q.pbinom <- function(s, c, p, n)
         pbinom(c - s, n - s, nps)
     }
 
-## qfunc, for debugging purposes
-qfunc <- function(c, p, n)
+## genBinomTest
+
+genBinomTest <- function(x, n, p = 0.5,
+                         alternative = "less")
     {
-        max(sapply(0:c, q.pbinom, c = c, p = p, n = n))
+        ## warnings
+        DNAME <- deparse(substitute(x))
+
+
+        ## calc statistics
+        pval.lower <- calcPvalue(x, n, p)
+        pval.upper <- calcPvalue(n - x, n, 1 - p)
+        ## pval.twosided <-
+
+        method <- "Generalized Binomial Test"
+        null.hypothesis <- " to be added "
+        ## sample.est <- n * p
+        null.value <- p
+
+        ## return values
+        structure(list(method = method,
+                       data.name = DNAME,
+                       x = x,
+                       n = n,
+                       p = p,
+                       null.hypothesis = null.hypothesis,
+                       ## estimate = sample.est,
+                       pvalues = c(pval.lower, pval.upper),
+                       null.value = null.value),
+                  class = "genbinom")
+
     }
+
+
+##
+## old implementation of calcPvalue
+##
+## if(c <= (n*p - 1))
+##     {
+##         ## function B(c, p)
+##         res <- pbinom(c, n, p)
+##     }
+## else
+##     {
+##         if(c >= (n*p))
+##             {
+##                 ## else return 1
+##                 res <- 1
+##             }
+##         else
+##             {
+##                 ## function Q(c, p)
+##                 res <- max(sapply(0:c, q.pbinom,
+##                                   c = c, p = p, n = n))
+##             }
+##     }

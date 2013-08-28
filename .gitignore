@@ -27,3 +27,6 @@
 /stata/npmean.sthlp
 /stata/stochin.ado
 /stata/stochin.sthlp
+/R/.Rhistory
+/R/iid_binomtest.R
+/stata/calcPvalue.ado

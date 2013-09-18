@@ -98,8 +98,8 @@ genBinomTest <- function(x, n, p = 0.5,
 ## however the algorithm itself is simpler:
 
 ## - find the smaller of Pr(k<=6) and Pr(k>=6), here Pr(k<=6) is smaller
-## - assume Pr(k<=6) is smaller than Pr(k>=6)
-## let u1 be the smallest value of u such that Pr(k>=u)<=Pr(k<=6)
+## - assume Pr(k<=6) is smaller than Pr(k>=6)#
+# let u1 be the smallest value of u such that Pr(k>=u)<=Pr(k<=6)
 ## set p value equal to Pr(k<=6)+Pr(k>=u1)
 ## set g=1, continue to increase g by 1 as long as new p value
 ## is generated as follows:
@@ -109,23 +109,6 @@ genBinomTest <- function(x, n, p = 0.5,
 ## then Pr(k <= 6) + Pr(k >= u1 + g) < Pr(k <= l2) + Pr(k >= u1 + g - 1)
 ## - analogous if Pr(k<=6) is strictly larger than P(k>=6)
 
-## so we find [6,9] and not [6,10] as 0.35+0.028>=0.1502+0.1493
-
-## illustration: assume table
-## Pr(k<=5)=0.17
-## Pr(k<=6)=0.35
-## Pr(k<=7)=0.61
-## and
-## Pr(k>=10)=0.028
-## Pr(k>=9)=0.3
-## Pr(k>=8)=0.38
-
-## then we get [6,10] as Pr(k <= 6) + Pr(k >= 10) = 0.38 < 0.47 = Pr(k
-## <= 5) + Pr(k >= 9) and hence pvalue 0.38
-
-## note that the (1-alpha)*100% confidence interval is easier to
-## find. just look for the two p values that make Pr(k<=6)=alpha/2 and
-## Pr(k>=6)=alpha/2.
 
         ## calc statistics
         pval.upper <- calcPvalue(n - x, n, 1 - p)
@@ -133,61 +116,59 @@ genBinomTest <- function(x, n, p = 0.5,
         pval.twosided <- NA
         if(pval.lower < pval.upper)
             {
-                u <- calcPvalueVec(n - x, n, 1 - p)
-                ## print(u)
-                u1 <- n - (sum(u <= pval.lower) - 1)
-                ## print(paste("u1 1:", u1))
+                ## find the smallest k s.t. P(X<=x) >= P(X>=k)
+                ## and sum the two up
+                u1 <- n - (sum(calcPvalueVec(n - x, n, 1 - p) <= pval.lower) - 1)
                 pval.two.upper <- calcPvalue(n - u1, n, 1 - p)
-                ## print(pval.two.upper)
                 pval.twosided <- pval.two.upper + pval.lower
 
+                ## see if we can do better:
+                ## increase g by 1 if
+                ## P(X<=x) + P(X>=u1+g) < P(X<=l2) + P(X>=u1+g-1)
+                ## where l2 is the largest value of l s.t.
+                ## P(X<=l) <= (P(X<=x) + P(X>=u1+g))/2
+                ## then the new p-Value is
+                ## P(X<=x) + P(X>=u1+g)
                 g <- 0
-                l <- (pval.lower + calcPvalue(n - u1 + g, n, 1 - p))/2
-                ## print(paste("l 1:", l))
-                l2 <- sum(calcPvalueVec(x, n, p) <= l)
-                ## print(paste("l2 1:", l2))
+                ## l <- (pval.lower + calcPvalue(n - u1 + g, n, 1 -
+                ## p))/2 == pval.twosided/2
+                l2 <- sum(calcPvalueVec(x, n, p) <= pval.twosided/2) - 1
                 while(((pval.lower + calcPvalue(n - u1 + g, n, 1 - p)) < (calcPvalue(l2, n, p) + calcPvalue(n - u1 + g - 1, n, 1 - p))) & (u1 + g <= n))
                     {
-                        ## print(paste("g 1:", g))
                         pval.two.upper <- calcPvalue(n - u1 + g, n, 1 - p)
                         pval.twosided <- pval.two.upper + pval.lower
                         g <- g + 1
                         l <- (pval.lower + calcPvalue(n - u1 + g, n, 1 - p))/2
-                        ## print(paste("l 1:", l))
-                        l2 <- sum(calcPvalueVec(x, n, p) <= l)
-                        ## print(l2)
+                        l2 <- sum(calcPvalueVec(x, n, p) <= l) - 1
                     }
-                twosidedbounds <- c(x, u1 + g - 1)
+                ## reset g to its correct value
+                g <- max(0, g - 1)
+                ## the bounds of P(X<x) and P(X>u1+g)
+                twosidedbounds <- c(x, u1 + g)
+                ## in some cases, when np - 1<=x<np the pvalue may
+                ## reach above one, reset this here
                 pval.twosided <- ifelse(pval.twosided <= 1,
                                         pval.twosided, 1)
             }
         else if(pval.lower > pval.upper)
             {
-                u <- calcPvalueVec(x, n, p)
-                ## print(u)
-                u1 <- sum(u <= pval.upper)
-                ## print(paste("u1 2:", u1))
+                u1 <- sum(calcPvalueVec(x, n, p) <= pval.upper) - 1
                 pval.two.lower <- calcPvalue(u1, n, p)
-                ## print(pval.two.lower)
                 pval.twosided <- pval.two.lower + pval.upper
 
                 g <- 0
                 l <- (pval.upper + calcPvalue(u1 + g, n, p))/2
-                ## print(l)
-                l2 <- sum(calcPvalueVec(n - x, n, 1 - p) <= l)
-                ## print(paste("l2 2:", l2))
+                l2 <- sum(calcPvalueVec(n - x, n, 1 - p) <= l) - 1
                 while(((pval.upper + calcPvalue(u1 + g, n, p)) < (calcPvalue(n - l2, n, 1 - p) + calcPvalue(u1 + g - 1, n, p))) & (u1 + g <= n))
                     {
-                        ## print(paste("g 2:", g))
                         pval.two.lower <- calcPvalue(u1 + g, n, p)
                         pval.twosided <- pval.two.lower + pval.upper
                         g <- g + 1
                         l <- (pval.upper + calcPvalue(u1 + g, n, p))/2
-                        ## print(paste("l 2:", l))
-                        l2 <- sum(calcPvalueVec(n - x, n, 1 - p) <= l)
-                        ## print(l2)
+                        l2 <- sum(calcPvalueVec(n - x, n, 1 - p) <= l) - 1
                     }
-                twosidedbounds <- c(u1 + g - 1, x)
+                g <- max(0, g - 1)
+                twosidedbounds <- c(u1 + g, x)
                 pval.twosided <- ifelse(pval.twosided <= 1,
                                         pval.twosided, 1)
             }
@@ -199,7 +180,6 @@ genBinomTest <- function(x, n, p = 0.5,
 
         method <- "Generalized Binomial Test"
         null.hypothesis <- " to be added "
-        ## sample.est <- n * p
         null.value <- p
 
         ## return values

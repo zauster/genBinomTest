@@ -27,8 +27,8 @@ print.genbinom <- function(x, digits = 5, prefix = "", ...)
         format(x$pvalues[2], digits = digits), "\n", sep = "")
     cat("\tP(X <= ", x$x, "):\t\t",
         format(x$pvalues[1], digits = digits), "\n", sep = "")
-    cat("\tP(X < ", x$twosidedbounds[1],
-        ", X > ", x$twosidedbounds[2], "):\t",
+    cat("\tP(X <= ", x$twosidedbounds[1],
+        ", X >= ", x$twosidedbounds[2], "):\t",
         format(x$pvalues[3], digits = digits), "\n", sep = "")
 
     if(!is.null(x$conf.int))

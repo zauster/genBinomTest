@@ -3,7 +3,7 @@
 /* capture program drop genBinomTest */
 program genBinomTest, rclass
 
-    version 12.0
+    /* version 12.0 */
     args N x p
 /* syntax N(integer) x(integer) p(real 0.5) */
 
@@ -173,7 +173,7 @@ end
 /* capture program drop calcPvalue */
 program calcPvalue, rclass
 
-    version 12.0
+    /* version 12.0 */
     args N x p
 
     /* display `x' */

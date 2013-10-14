@@ -17,25 +17,31 @@ print.genbinom <- function(x, digits = 5, prefix = "", ...)
     cat("N\tObserved k\tExpected k\n")
     cat(x$n, "\t", x$x, "\t\t", format(x$n * x$p, digits = 5),
         "\n", sep = "")
-    cat("\tAssumed p\tObserved p\n")
+    cat("\tAssumed p\tThreshold p\n")
     cat("\t", format(x$p, digits = digits), "\t\t",
         format(x$x / x$n, digits = digits), "\n", sep = "")
 
     ## cat("alternative:", x$alternative, "\n")
-    cat("\nP Values:\n")
-    cat("\tP(X >= ", x$x, "):\t\t",
-        format(x$pvalues[2], digits = digits), "\n", sep = "")
-    cat("\tP(X <= ", x$x, "):\t\t",
-        format(x$pvalues[1], digits = digits), "\n", sep = "")
-    cat("\tP(X <= ", x$twosidedbounds[1],
-        ", X >= ", x$twosidedbounds[2], "):\t",
-        format(x$pvalues[3], digits = digits), "\n", sep = "")
+    cat("\np-Value of H_0:\t\t\t Confidence Intervals\n")
+    cat("\tp <= ", x$null.value, ":\t",
+        format(x$pvalues["pval.upper"], digits = digits), sep = "")
+    cat("\t", format(c(x$ci.upper[1], x$ci.upper[2])), "\n")
+
+    cat("\tp >= ", x$null.value, ":\t",
+        format(x$pvalues["pval.lower"], digits = digits), sep = "")
+    cat("\t", format(c(x$ci.lower[1], x$ci.lower[2])), "\n")
+
+    cat("\tp = ", x$null.value, ":\t",
+        format(x$pvalues["pval.twosided"], digits = digits), sep = "")
+    cat("\t", format(c(x$ci.twosided[1], x$ci.twosided[2])), "\n")
 
     if(!is.null(x$conf.int))
         {
-        cat(format(100 * attr(x$conf.int, "conf.level")),
-            "percent confidence interval:\n",
-            format(c(x$conf.int[1L], x$conf.int[2L])), "\n")
+            cat("\n")
+            cat(format(100 * (1 - x$conf.level)),
+                "percent confidence interval:\n",
+                format(c(x$conf.int[1L], x$conf.int[2L]),
+                       digits = digits), "\n")
     }
 
     ## if(!is.null(x$estimate)) {

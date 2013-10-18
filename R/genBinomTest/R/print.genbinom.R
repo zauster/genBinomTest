@@ -1,12 +1,3 @@
-
-## print.genbinom
-## a function to display the output of the generalized binomial test
-
-## Proposal: (STATA-like)
-##    N   Observed k   Expected k   Assumed p   Observed p
-## -------------------------------------------------------
-##   10          7            4       0.40000      0.70000
-
 print.genbinom <- function(x, digits = 5, prefix = "", ...)
     {
     cat("\n")
@@ -23,22 +14,22 @@ print.genbinom <- function(x, digits = 5, prefix = "", ...)
 
     ## cat("alternative:", x$alternative, "\n")
     cat("\np-Value of H_0:\t\t\t Confidence Intervals\n")
-    cat("\tp <= ", x$p, ":\t",
+    cat("\tp <= ", x$null.value, ":\t",
         format(x$pvalues["pval.upper"], digits = digits), sep = "")
     cat("\t", format(c(x$ci.upper[1], x$ci.upper[2])), "\n")
 
-    cat("\tp >= ", x$p, ":\t",
+    cat("\tp >= ", x$null.value, ":\t",
         format(x$pvalues["pval.lower"], digits = digits), sep = "")
     cat("\t", format(c(x$ci.lower[1], x$ci.lower[2])), "\n")
 
-    cat("\tp = ", x$p, ":\t",
+    cat("\tp = ", x$null.value, ":\t",
         format(x$pvalues["pval.twosided"], digits = digits), sep = "")
     cat("\t", format(c(x$ci.twosided[1], x$ci.twosided[2])), "\n")
 
     if(!is.null(x$conf.int))
         {
             cat("\n")
-            cat(format(100 * (1 - x$conf.level)),
+            cat(format(100 * (1 - x$alpha)),
                 "percent confidence interval:\n",
                 format(c(x$conf.int[1L], x$conf.int[2L]),
                        digits = digits), "\n")

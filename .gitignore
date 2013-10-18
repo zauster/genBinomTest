@@ -30,3 +30,6 @@
 /R/.Rhistory
 /R/iid_binomtest.R
 /stata/calcPvalue.ado
+/R/genBinomTest.Rcheck/*
+/R/genBinomTest/Read-and-delete-me
+/R/genBinomTest/R/calcCI.R

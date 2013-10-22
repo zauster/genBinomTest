@@ -9,6 +9,9 @@ genBinomTest <- function(x, n, p = 0.5, alpha = 0.05)
         ## warnings
         DNAME <- deparse(substitute(x))
 
+        if(x > n | x < 0 | n < 0 | p < 0 | p > 1 | alpha < 0 | alpha > 1)
+            stop("Please supply sensible values for x, n, p and alpha.")
+
         ## calc statistics
         pval.upper <- calcPvalue(n - x, n, 1 - p)
         pval.lower <- calcPvalue(x, n, p)
@@ -87,7 +90,7 @@ genBinomTest <- function(x, n, p = 0.5, alpha = 0.05)
 
         method <- "Generalized Binomial Test"
         ## null.hypothesis <- " to be added "
-        null.value <- p
+        ## null.value <- p
         pvalues <- c(pval.upper, pval.lower, pval.twosided)
         names(pvalues) <- c("pval.upper", "pval.lower", "pval.twosided")
         ci.upper <- c(calcCI(x, n, alpha = alpha, side = "lower"), 1)

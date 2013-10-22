@@ -72,9 +72,8 @@ Karl Schlag, Oliver Reiter
 \url{http://homepage.univie.ac.at/karl.schlag/research/statistics/}
 }
 \examples{
-genBinomTest(8, 13, p = 0.85)
+## with 8 successes out of 13 trials, can we reject H0: p >= 0.85?
+genBinomTest(8, 13, p = 0.8)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{binomial test}
 \keyword{independent trials}

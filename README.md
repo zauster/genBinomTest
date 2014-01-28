@@ -1,9 +1,9 @@
 genBinomTest
 =======
 
-An R Package for nonparametric (or distribution-free) hypothesis tests.
+`genBinomTest` implements a *generalized binomial test* for independently (**not necessarily identically**) distributed binomal random variables.
 
-## How to download this package
+## How to download this R-package
 
 ### Regular users
 
@@ -29,6 +29,14 @@ There are two ways to download the R-package:
 5. Inside R: Go to the folder which contains the downloaded file and continue with 6. from above.
 
 To just download the manual, click on `genBinomTest.pdf` and `View Raw`.
+
+## How to download this STATA-package
+
+1. As for now, the only possibility is to download the whole repository with `Download ZIP`
+2. Extract `genBinomTest-master.zip`
+3. Start STATA
+4. Set the working directory to `\path\to\genBinomTest\stata` OR
+4. Copy `genBinomTest.ado` and `genBinomTest.sthlp` to a folder where you keep your `.ado`-files, so that it gets automatically loaded at STATA-startup
 
 ### Developers
 
